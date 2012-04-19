@@ -60,14 +60,16 @@ sub to16 {
 $|=1;
 
 # perform handshake. we support ABI 1
-
+# since we do check for number of arguments >= 6 
+# and do not use fields 7 and 8
+# we can support ABI versions 2 and 3 as well
 my $helo = <>;
 chomp($helo);
 
-unless($helo eq "HELO\t1") {
-	print "FAIL\n";
-	while(<>) {};
-	exit;
+unless ($helo =~ /HELO\t[123]/) {
+        print "FAIL\n";
+        while(<>) {};
+        exit;
 }
 
 my $domains;
