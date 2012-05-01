@@ -8,13 +8,13 @@
 use strict;
 use warnings;
 use 5.005;
+use Config::Simple;
 
-# Configure domains to give reply for, note that you *must* configure
-# SOA to somewhere else. 
+# Configure domains in rev.cfg, note that you *must* configure
+# SOA somewhere else. 
 # 
-my $domaintable = {
-        'dyn.test' => 'fe80:0000:0250:56ff'
-};
+my $Config = new Config::Simple('rev.cfg');
+my $domaintable = $Config->get_block('domaintable');
 
 my $ttl = 300;
 my $debug = 0;
