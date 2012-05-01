@@ -3,7 +3,6 @@ use warnings;
 use 5.005;
 use IPC::Open3;
 use Symbol 'gensym'; 
-use Data::Dumper;
 
 my($wr, $rd, $err);
 $err = gensym;
@@ -39,9 +38,9 @@ sub result {
 }
 
 sub harness {
-    # Use this for profiling, run dprofpp after test.pl is done
-    #$pid = open3($wr, $rd, $err, "/usr/bin/perl -d:DProf rev.pl");
-	$pid = open3($wr, $rd, $err, "./rev.pl");
+        # Use this for profiling, run dprofpp after test.pl is done
+        #$pid = open3($wr, $rd, $err, "/opt/local/bin/perl -d:DProf rev.pl");
+        $pid = open3($wr, $rd, $err, "./rev.pl");
 }
 
 sub finish {
