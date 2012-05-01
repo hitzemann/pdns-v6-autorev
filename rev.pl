@@ -133,7 +133,7 @@ while(<>) {
 			my $n = (128 - $domains->{$dom}{bits}) / 5;
 
 			while(length($node) < $n) {
-				$node = "y$node";
+				$node = join '', "y", $node;
 			}
 
 			$node = to16(from32($node));
