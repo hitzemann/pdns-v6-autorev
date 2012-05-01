@@ -3,6 +3,7 @@ use warnings;
 use 5.005;
 use IPC::Open3;
 use Symbol 'gensym'; 
+use Data::Dumper;
 
 my($wr, $rd, $err);
 $err = gensym;
@@ -38,7 +39,9 @@ sub result {
 }
 
 sub harness {
-	$pid = open3($wr, $rd, $err, "./rev.pl");
+    # Use this for profiling, run dprofpp after test.pl is done
+    #$pid = open3($wr, $rd, $err, "/usr/bin/perl -d:DProf rev.pl");
+	$pid = open3($wr, $rd, $err, "./perl -d:DProf rev.pl");
 }
 
 sub finish {
@@ -65,7 +68,7 @@ map {
 } (0 .. 0xffff);
 
 # speed test
-print "Testing speed for 0000 to ffff (this will take some time)";
+print "Testing speed for 0000 to ffff PTRs (this will take some time)";
 my $t0 = time;
 map { 
 	print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\n";
@@ -77,6 +80,29 @@ my $t = time - $t0;
 print "OK\n";
 my $qps = 65535/$t;
 
-print "Performance was $qps q/s\n";
+print "PTR Performance was $qps q/s\n";
+
+@list = [];
+open(NOD, '<nodes.txt');
+while (my $line = <NOD>) {
+    chomp $line;
+    push @list, $line;
+}
+close(NOD);
+shift @list;
+
+print "Testing speed for 0000 to ffff AAAAs (this will take some time)";
+$t0 = time;
+map {
+        print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\n";
+        my $scrap = <$rd>;
+        $scrap = <$rd>;
+} @list;
+$t = time - $t0;
+
+print "OK\n";
+$qps = 65535/$t;
+
+print "AAAA Performance was $qps q/s\n";
 
 finish;
