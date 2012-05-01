@@ -109,7 +109,6 @@ print "OK\tAutomatic reverse generator v1.0 starting\n";
 
 while(<>) {
 	chomp;
-        #my @arr=split(/[\t ]+/);
 	my @arr=split(/\t/);
 	if(@arr<6) {
 		print "LOG\tPowerDNS sent unparseable line\n";
