@@ -166,9 +166,10 @@ while(<>) {
 		foreach(keys %$domains) {
 			my $key = $_;
 			my $dom = $domains->{$_}{domain};
-			if ($node=~/(.*)\Q.$key\E$/) {
+                        my $index = index($node, $key);
+                        if ($index != -1) {
 				$qname = $node;
-				$node = $1;
+                                $node = substr($qname, 0, $index-1);
 
 				$node = join '', reverse split /\./, $node;
 
