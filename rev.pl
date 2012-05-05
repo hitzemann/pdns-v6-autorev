@@ -98,7 +98,7 @@ while(my ($dom,$prefix) = each %$domaintable) {
 
     # ensure the n. of bits is divisable by 16 (otherwise bad stuff happens)
     unless (($bits%16)==0) {
-        print "OK\t$dom has $prefix that is not divisable with 8\n";
+        print "OK\t$dom has $prefix that cannot be divided by 16\n";
         while(<>) {
             print "END\n";
         };
