@@ -11,42 +11,42 @@ my $pid;
 
 $|=1;
 sub speak {
-	my $out = shift;
-        print $wr "$out\n";
+    my $out = shift;
+    print $wr "$out\n";
 }
 
 sub expect  {
-        my $in = shift;
-	my $data = <$rd>;
-        chomp($data);
-        return $data=~m/$in/;
+    my $in = shift;
+    my $data = <$rd>;
+    chomp($data);
+    return $data=~m/$in/;
 }
 
 sub speak_and_expect {
-	my $out = shift;
-	my $in  = shift;
-	speak $out;
-	return expect $in;
+    my $out = shift;
+    my $in  = shift;
+    speak $out;
+    return expect $in;
 }
 
 sub result {
-	my $text = shift;
-	my $result = shift;
-	
-	$result and print "$text OK\n";
-	$result or print "$text FAIL\n";
+    my $text = shift;
+    my $result = shift;
+
+    $result and print "$text OK\n";
+    $result or print "$text FAIL\n";
 }
 
 sub harness {
-        # Use this for profiling, run dprofpp after test.pl is done
-        #$pid = open3($wr, $rd, $err, "/opt/local/bin/perl -d:DProf rev.pl");
-        $pid = open3($wr, $rd, $err, "./rev.pl");
+    # Use this for profiling, run dprofpp after test.pl is done
+    #$pid = open3($wr, $rd, $err, "/opt/local/bin/perl -d:DProf rev.pl");
+    $pid = open3($wr, $rd, $err, "./rev.pl");
 }
 
 sub finish {
-	close $wr;
-	close $rd;
-	waitpid($pid,0);
+    close $wr;
+    close $rd;
+    waitpid($pid,0);
 }
 
 harness;
@@ -63,16 +63,16 @@ expect "END";
 my @list;
 
 map {
-	push @list, (join '.', split //, sprintf("%04x",$_));
+push @list, (join '.', split //, sprintf("%04x",$_));
 } (0 .. 0xffff);
 
 # speed test
 print "Testing speed for 0000 to ffff PTRs (this will take some time)";
 my $t0 = time;
 map { 
-	print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\n";
-	my $scrap = <$rd>;
-	$scrap = <$rd>;
+print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\n";
+my $scrap = <$rd>;
+$scrap = <$rd>;
 } @list;
 my $t = time - $t0;
 
@@ -93,9 +93,9 @@ shift @list;
 print "Testing speed for 0000 to ffff AAAAs (this will take some time)";
 $t0 = time;
 map {
-        print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\n";
-        my $scrap = <$rd>;
-        $scrap = <$rd>;
+print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\n";
+my $scrap = <$rd>;
+$scrap = <$rd>;
 } @list;
 $t = time - $t0;
 
