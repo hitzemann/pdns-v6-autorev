@@ -106,7 +106,7 @@ while(my ($dom,$prefix) = each %$domaintable) {
     }
 }
 
-print "OK\tAutomatic reverse generator v1.0 starting\n";
+print "OK\tAutomatic reverse generator v0.1 starting\n";
 
 while(<>) {
     chomp;
