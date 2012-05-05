@@ -62,11 +62,12 @@ $|=1;
 # perform handshake. we support ABI 1
 # since we do check for number of arguments >= 6 
 # and do not use fields 7 and 8
-# we can support ABI versions 2 and 3 as well
+# we can support ABI version 2
+# ABI version 3 needs a different answer format
 my $helo = <>;
 chomp($helo);
 
-unless ($helo =~ /HELO\t[123]/) {
+unless ($helo =~ /HELO\t[12]/) {
         print "FAIL\n";
         while(<>) {};
         exit;
