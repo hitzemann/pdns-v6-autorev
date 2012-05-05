@@ -196,9 +196,9 @@ while(<>) {
     } elsif (@arr<3) {
         my ($type,$id)=@arr;
         if ($type eq 'PING') {
-            print "LOG\tReceived a PING...\n";
+            print "LOG\tReceived a PING...\n" if ($debug);
         } elsif ($type eq 'AXFR') {
-            print "LOG\tReceived an AXFR for $id\n";
+            print "LOG\tReceived an AXFR for $id\n" if ($debug);
         } else {
             print "FAIL\tUnsupported request\n";
         }
