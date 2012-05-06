@@ -40,6 +40,7 @@ sub result {
 sub harness {
     # Use this for profiling, run dprofpp after test.pl is done
     #$pid = open3($wr, $rd, $err, "/opt/local/bin/perl -d:DProf rev.pl");
+    #$pid = open3($wr, $rd, $err, "/opt/local/bin/perl -d:SmallProf rev.pl");
     $pid = open3($wr, $rd, $err, "./rev.pl");
 }
 
