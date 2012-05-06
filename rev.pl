@@ -128,7 +128,7 @@ while(<>) {
             print "LOG\t$qname $qclass $qtype?\n" if ($debug);
 
             # forward lookup handler
-            if (($qtype eq 'AAAA' || $qtype eq 'ANY') && $qname=~/${nodeprefix}([^.]*).(.*)/) {
+            if (($qtype eq 'AAAA' || $qtype eq 'ANY') && $qname=~/^${nodeprefix}([^.]*).(.*)/) {
                 my $node = $1;
                 my $dom = $2;
 
