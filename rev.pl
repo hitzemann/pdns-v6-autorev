@@ -155,8 +155,7 @@ while(<>) {
 
                         # build whole IPv6 address and add : to correct placs
                         $dname = $tmp.$dname;
-                        $dname=~s/(.{4})/$1:/g;
-                        chop $dname;
+                        $dname = join ':', substr($dname, 0, 4), substr($dname, 4, 4), substr($dname, 8, 4), substr($dname, 12, 4), substr($dname, 16, 4), substr($dname, 20, 4), substr($dname, 24, 4), substr($dname, 28, 4);
 
                         # reply with value
                         print "LOG\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n" if ($debug);
