@@ -18,7 +18,13 @@ my $domaintable = $Config->get_block('domaintable');
 
 my $ttl = 300;
 my $debug = 0;
+# Set to 0 if you do not want to use Memoize
+# It needs more memory, but speeds queries up
+# Makes only sense if you have a lot of different subnets
+# with identical host parts.
+my $memoize = 0;
 my $nodeprefix = 'node-';
+my $VERSION = "0.2";
 
 # end of configuration.
 
@@ -56,6 +62,12 @@ sub to16 {
     my $str = shift;
     return unpack "H*", $str;
 }
+
+use Memoize;
+memoize('from32');
+memoize('to32');
+memoize('from16');
+memoize('to16');
 
 $|=1;
 
@@ -106,7 +118,7 @@ while(my ($dom,$prefix) = each %$domaintable) {
     }
 }
 
-print "OK\tAutomatic reverse generator v0.1 starting\n";
+print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 
 while(<>) {
     chomp;
