@@ -63,11 +63,13 @@ sub to16 {
     return unpack "H*", $str;
 }
 
-use Memoize;
-memoize('from32');
-memoize('to32');
-memoize('from16');
-memoize('to16');
+if (1 == $memoize) {
+    use Memoize;
+    memoize('from32');
+    memoize('to32');
+    memoize('from16');
+    memoize('to16');
+}
 
 $|=1;
 
