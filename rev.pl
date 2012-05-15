@@ -25,12 +25,6 @@ my $debug = 0;
 my $memoize = 0;
 my $nodeprefix = 'node-';
 my $VERSION = "0.2";
-my $mainserver = 'ns1.dyn.test.';
-my $adminmail = 'admin.dyn.test.';
-my $soa = "${mainserver} ${adminmail} 1 10800 3600 604800 3600";
-my @nameservers;
-push @nameservers, $mainserver;
-push @nameservers, 'ns3.dyn.test.';
 
 # end of configuration.
 
@@ -180,12 +174,6 @@ while(<>) {
                         # reply with value
                         print "LOG\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n" if ($debug);
                         print "DATA\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n";
-                        print "LOG\t$dom\t$qclass\tSOA\t$ttl\t$id\t$soa\n" if ($debug);
-                        print "DATA\t$dom\t$qclass\tSOA\t$ttl\t$id\t$soa\n";
-                        foreach my $ns (@nameservers) {
-                            print "LOG\t$dom\t$qclass\tNS\t$ttl\t$id\t$ns\n" if ($debug);
-                            print "DATA\t$dom\t$qclass\tNS\t$ttl\t$id\t$ns\n";
-                        }
                     }
                 }
                 # reverse lookup
@@ -212,12 +200,6 @@ while(<>) {
 
                         print "LOG\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n" if ($debug);
                         print "DATA\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n";
-                        print "LOG\t$key\t$qclass\tSOA\t$ttl\t$id\t$soa\n" if ($debug);
-                        print "DATA\t$key\t$qclass\tSOA\t$ttl\t$id\t$soa\n";
-                        foreach my $ns (@nameservers) {
-                            print "LOG\t$key\t$qclass\tNS\t$ttl\t$id\t$ns\n" if ($debug);
-                            print "DATA\t$key\t$qclass\tNS\t$ttl\t$id\t$ns\n";
-                        }
                     }
                 }
             }
