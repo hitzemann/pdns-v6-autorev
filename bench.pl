@@ -61,12 +61,12 @@ cmpthese (0, {
 
 cmpthese (0, {
         'regexp (old)' => sub {
-            my $str = 'deadbeefcafebabe73311234';
+            my $str = 'fe80fe80deadbeefcafebabe73311234';
             $str =~ s/(.{4})/$1:/g;
             chop $str;
         } ,
         'join (new)' => sub {
-            my $str = 'deadbeefcafebabe73311234';
+            my $str = 'fe80fe80deadbeefcafebabe73311234';
             $str = join ':', substr($str, 0, 4), substr($str, 4, 4), substr($str, 8, 4), substr($str, 12, 4), substr($str, 16, 4), substr($str, 20, 4), substr($str, 24, 4), substr($str, 28, 4);
         }
     });
