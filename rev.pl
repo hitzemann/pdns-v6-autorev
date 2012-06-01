@@ -22,6 +22,7 @@ my $domaintable = $Config->get_block('domaintable');
 # SQL connection to configure things. if you set this to 1, you 
 # unleash the SQL version, and it'll override your domain table. 
 my $use_database = 0;
+#TODO: Use Postgres
 my $dsn = "dbi:mysql:database=pdns;host=localhost";
 my $dsn_user = "pdns";
 my $dsn_password = "password";
