@@ -2,6 +2,7 @@
 
 ##
 # IPv6 automatic reverse/forward generator script by Aki Tuomi
+# Enhanced/Modified by Simon Hitzemann
 # Released under the GNU GENERAL PUBLIC LICENSE v2
 ##
 
