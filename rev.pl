@@ -42,7 +42,7 @@ my %v2b = do {
 my %b2v = reverse %v2b;
 
 # These four subs are the bottleneck of the backend. If you know a way to implement them fast please let me know.
-sub convert_base32_to_binary($) {
+sub convert_base32_to_binary {
 	my $str = shift;
 	$str =~ tr/ybndrfg8ejkmcpqxot1uwisza345h769//cd;
 	$str =~ s/(.)/$v2b{$1}/g;
@@ -51,7 +51,7 @@ sub convert_base32_to_binary($) {
 	return scalar pack "B*", $str;
 }
 
-sub convert_binary_to_base32($) {
+sub convert_binary_to_base32 {
 	my $str = shift;
 	my $ret = unpack "B*", $str;
 	$ret .= 0 while ( length $ret ) % 5;
@@ -59,13 +59,13 @@ sub convert_binary_to_base32($) {
 	return $ret;
 }
 
-sub convert_base16_to_binary($) {
+sub convert_base16_to_binary {
 	my $str = shift;
 	$str =~ tr/0-9a-f//cd;
 	return scalar pack "H*", lc $str;
 }
 
-sub convert_binary_to_base16($) {
+sub convert_binary_to_base16 {
 	my $str = shift;
 	return unpack "H*", $str;
 }
@@ -79,7 +79,7 @@ if (1 == $memoize) {
 	memoize('convert_binary_to_base16');
 }
 
-sub rev_to_prefix($) {
+sub rev_to_prefix {
 	my $rev = shift;
 	$rev =~ s/\Q.ip6.arpa\E$//i;
 	my $prefix = join '', (reverse split /\./, $rev);
@@ -89,7 +89,7 @@ sub rev_to_prefix($) {
 }
 
 # Build domaintable from data in the database instead of the cfg file
-sub load_domaintable() {
+sub load_domaintable {
 
   # Connect to the configured DB
   my $d = DBI->connect($dsn, $dsn_user, $dsn_password);
