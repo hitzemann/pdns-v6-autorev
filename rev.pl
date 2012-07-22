@@ -42,7 +42,7 @@ my %v2b = do {
 my %b2v = reverse %v2b;
 
 # These four subs are the bottleneck of the backend. If you know a way to implement them fast please let me know.
-sub from32 {
+sub convert_base32_to_binary($) {
 	my $str = shift;
 	$str =~ tr/ybndrfg8ejkmcpqxot1uwisza345h769//cd;
 	$str =~ s/(.)/$v2b{$1}/g;
@@ -51,7 +51,7 @@ sub from32 {
 	return scalar pack "B*", $str;
 }
 
-sub to32 {
+sub convert_binary_to_base32($) {
 	my $str = shift;
 	my $ret = unpack "B*", $str;
 	$ret .= 0 while ( length $ret ) % 5;
@@ -59,13 +59,13 @@ sub to32 {
 	return $ret;
 }
 
-sub from16 {
+sub convert_base16_to_binary($) {
 	my $str = shift;
 	$str =~ tr/0-9a-f//cd;
 	return scalar pack "H*", lc $str;
 }
 
-sub to16 {
+sub convert_binary_to_base16($) {
 	my $str = shift;
 	return unpack "H*", $str;
 }
@@ -73,13 +73,13 @@ sub to16 {
 # Check if we want to use memoize. It will cache the 16->32 and 32->16 conversions. This will only cause a noticable speedup if you have multiple subnets with mostly identical host parts in them. This should be against the principles of IPv6 (sparse subnets), but might be interesting for ISPs.
 if (1 == $memoize) {
 	use Memoize;
-	memoize('from32');
-	memoize('to32');
-	memoize('from16');
-	memoize('to16');
+	memoize('convert_base32_to_binary');
+	memoize('convert_binary_to_base32');
+	memoize('convert_base16_to_binary');
+	memoize('convert_binary_to_base16');
 }
 
-sub rev2prefix {
+sub rev_to_prefix($) {
 	my $rev = shift;
 	$rev =~ s/\Q.ip6.arpa\E$//i;
 	my $prefix = join '', (reverse split /\./, $rev);
@@ -89,7 +89,7 @@ sub rev2prefix {
 }
 
 # Build domaintable from data in the database instead of the cfg file
-sub load_domaintable {
+sub load_domaintable() {
 
   # Connect to the configured DB
   my $d = DBI->connect($dsn, $dsn_user, $dsn_password);
@@ -118,11 +118,11 @@ sub load_domaintable {
 	while (my ($d_id, $d_data) = each %$tmptable) {
   	$stmt->execute(($d_data->{'partner_id'})) or next;
   	if ($stmt->rows == 0) {
-  		print "LOG\tWARNING: Failed to locate prefix for ",$d_data->{'domain'},"\n";
+  		print "LOG\tWARNING: Failed to locate prefix for ", $d_data->{'domain'}, "\n";
   		next;
  		}
  		my ($prefix) = $stmt->fetchrow_array;
- 		$prefix = rev2prefix($prefix);
+ 		$prefix = rev_to_prefix($prefix);
  		$domaintable->{$d_data->{'domain'}} = $prefix;
 	}
   $stmt->finish;
@@ -147,11 +147,11 @@ unless ($helo =~ /HELO\t[12]/) {
 # If we use the database for generating the domaintable hash we will do it
 # now.
 if ($use_database) {
-  print "LOG\tLoading domains from database\n";
+  print "LOG\tLoading domains from database\n" if (1 == $debug);
   require DBI;
 	load_domaintable;
 } else {
-  print "LOG\tLoading domains from config file\n";
+  print "LOG\tLoading domains from config file\n" if (1 == $debug);
   require Config::Simple;
   my $Config = new Config::Simple('rev.cfg');
   $domaintable = $Config->get_block('domaintable');
@@ -160,7 +160,7 @@ if ($use_database) {
 my $domains;
 
 # Build domain table configuration from domaintable hash.
-while(my ($dom,$prefix) = each %$domaintable) {
+while (my ($dom, $prefix) = each %$domaintable) {
 	$domains->{$dom} = $prefix;
 
 	# Convert the subnet to revnibbles by removing the colons first.
@@ -179,7 +179,7 @@ while(my ($dom,$prefix) = each %$domaintable) {
   }
 
   # Now reverse the string and put dots in between.
-	$tmp = join '.', reverse split //,$tmp;
+	$tmp = join '.', reverse split //, $tmp;
 	$tmp=~s/^[.]//;
 	$tmp=~s/[.]$//;
 
@@ -193,18 +193,18 @@ print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 
 while(<>) {
 	chomp;
-	my @arr=split(/\t/);
+	my @arguments=split(/\t/);
   # Check if there are 2 or 6-8 arguments. (2 for PING etc, 6-8 for Q) 
-	unless ((@arr >= 6 && @arr <= 8) || @arr == 2) {
+	unless ((@arguments >= 6 && @arguments <= 8) || @arguments == 2) {
 		print "LOG\tPowerDNS sent unparseable line\n";
 		print "FAIL\n";
 		next;
 	}
 
 	# With 6-8 arguments it must be a Q request.
-	if (@arr >= 6 && @arr <= 8) {
+	if (@arguments >= 6 && @arguments <= 8) {
 
-		my ($type, $qname, $qclass, $qtype, $id, $ip) = @arr;
+		my ($type, $qname, $qclass, $qtype, $id, $ip) = @arguments;
     # Make sure it actually is a Q
 		if ($type eq 'Q') {
 			print "LOG\t$qname $qclass $qtype?\n" if ($debug);
@@ -224,7 +224,7 @@ while(<>) {
 					}
 
           # Now we convert the string to binary and the binary to hex.
-					$node = to16(from32($node));
+					$node = convert_binary_to_base16(convert_base32_to_binary($node));
 
           # Check if the converted host part has the correct length for this domain
 					$n = (128 - $domains->{$dom}{bits}) / 4;
@@ -261,7 +261,7 @@ while(<>) {
             # Reverse the node name and remove the dots
 						$node = join '', reverse split /\./, $node;
 						# Now we convert from hex to binary and from binary to the host name string
-						$node = to32(from16($node));
+						$node = convert_binary_to_base32(convert_base16_to_binary($node));
 
 						# There might have been many leading zeroes which convert to y, we remove those as we add them again during the forward lookup
 						$node =~ s/^y*//;
@@ -278,9 +278,9 @@ while(<>) {
       # The type of the query was not Q
 			print "FAIL\tUnsupported request\n";
 		}
-	} elsif (@arr == 2) {
+	} elsif (@arguments == 2) {
     # This must be one of requests which need one argument (PING, AXFR)
-		my ($type,$id)=@arr;
+		my ($type, $id) = @arguments;
 			if ($type eq 'PING') {
         # We only need to reply with END to PING
 				print "LOG\tReceived a PING...\n" if ($debug);
