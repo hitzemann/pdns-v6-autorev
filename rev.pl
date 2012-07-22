@@ -147,11 +147,11 @@ unless ($helo =~ /HELO\t[12]/) {
 # If we use the database for generating the domaintable hash we will do it
 # now.
 if ($use_database) {
-  print "LOG\tLoading domains from database\n" if (1 == $debug);
+  print "LOG\tLoading domains from database\n" if ($debug);
   require DBI;
 	load_domaintable;
 } else {
-  print "LOG\tLoading domains from config file\n" if (1 == $debug);
+  print "LOG\tLoading domains from config file\n" if ($debug);
   require Config::Simple;
   my $Config = new Config::Simple('rev.cfg');
   $domaintable = $Config->get_block('domaintable');
