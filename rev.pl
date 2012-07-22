@@ -9,7 +9,6 @@ use strict;
 use warnings;
 use 5.005;
 use Config::Simple;
-use common::sense;
 
 # Configure domains in rev.cfg, note that you *must* configure SOA and NS records somewhere else. Please use an absolute path to the config file.
 my $cfg = 'rev.cfg';
