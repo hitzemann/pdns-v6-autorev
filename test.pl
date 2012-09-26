@@ -52,13 +52,13 @@ sub finish {
 
 harness;
 
-result "Open", speak_and_expect "HELO\t1","^OK.*";
+result "Open", speak_and_expect "HELO\t3","^OK.*";
 
-speak "Q\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1";
-result "Reverse ",expect "DATA\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tPTR\t300\t-1\tnode-86uph4e.dyn.test";
+speak "Q\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1";
+result "Reverse ",expect "DATA\t0\t1\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tPTR\t300\t-1\tnode-86uph4e.dyn.test";
 expect "END";
-speak "Q\tnode-86uph4e.dyn.test\tIN\tANY\t-1\t127.0.0.1";
-result "Forward ",expect "DATA\tnode-86uph4e.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250:56ff:0000:0000:fe9b:79a4";
+speak "Q\tnode-86uph4e.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1";
+result "Forward ",expect "DATA\t0\t1\tnode-86uph4e.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250:56ff:0000:0000:fe9b:79a4";
 expect "END";
 
 my @list;
@@ -71,7 +71,7 @@ push @list, (join '.', split //, sprintf("%04x",$_));
 print "Testing speed for 0000 to ffff PTRs (this will take some time)";
 my $t0 = time;
 map { 
-print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\n";
+print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
 my $scrap = <$rd>;
 $scrap = <$rd>;
 } @list;
@@ -94,7 +94,7 @@ shift @list;
 print "Testing speed for 0000 to ffff AAAAs (this will take some time)";
 $t0 = time;
 map {
-print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\n";
+print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
 my $scrap = <$rd>;
 $scrap = <$rd>;
 } @list;
