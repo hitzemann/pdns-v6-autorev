@@ -30,7 +30,7 @@ my $debug = 0;
 # Set to 1 if you want to use Memoize. It needs more memory, but speeds queries up. It makes only sense though if you have a lot of different subnets with identical host parts.
 my $memoize = 0;
 my $nodeprefix = 'node-';
-my $VERSION = "0.3";
+my $VERSION = "0.4";
 
 # End of configuration.
 
@@ -137,8 +137,8 @@ $|=1;
 my $helo = <>;
 chomp($helo);
 
-# Check for ABI versions 1 or 2
-unless ($helo =~ /HELO\t[12]/) {
+# Game has changed, check for ABI version 3 only
+unless ($helo =~ /HELO\t3/) {
 	print "FAIL\n";
 	while(<>) {};
 	exit;
@@ -194,17 +194,17 @@ print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 while(<>) {
 	chomp;
 	my @arguments=split(/\t/);
-  # Check if there are 2 or 6-8 arguments. (2 for PING etc, 6-8 for Q) 
-	unless ((@arguments >= 6 && @arguments <= 8) || @arguments == 2) {
+  # Check if there are 2 or 8 arguments. (2 for PING etc, 8 for Q) 
+	unless (@arguments == 8  || @arguments == 2) {
 		print "LOG\tPowerDNS sent unparseable line\n";
 		print "FAIL\n";
 		next;
 	}
 
 	# With 6-8 arguments it must be a Q request.
-	if (@arguments >= 6 && @arguments <= 8) {
+	if (@arguments == 8) {
 
-		my ($type, $qname, $qclass, $qtype, $id, $ip) = @arguments;
+		my ($type, $qname, $qclass, $qtype, $id, $ip, $localip, $endssubnet) = @arguments;
     # Make sure it actually is a Q
 		if ($type eq 'Q') {
 			print "LOG\t$qname $qclass $qtype?\n" if ($debug);
@@ -238,9 +238,9 @@ while(<>) {
             # Put in the colons. Yes, this looks horrbily insane, but is roughly 250% faster than the previosu regexp way.
 						$dname = join ':', substr($dname, 0, 4), substr($dname, 4, 4), substr($dname, 8, 4), substr($dname, 12, 4), substr($dname, 16, 4), substr($dname, 20, 4), substr($dname, 24, 4), substr($dname, 28, 4);
 
-						# Send out the reply
-						print "LOG\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n" if ($debug);
-						print "DATA\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n";
+						# Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
+						print "LOG\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n" if ($debug);
+						print "DATA\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n";
 					}
 				}
 			# Check if this is a reverse lookup. Since PowerDNS mostly asks for ANY we need to check it we check for ip6.arpa at the end of the queried name.
@@ -268,9 +268,9 @@ while(<>) {
             # Special case: node IP was all zeroes (would that be valid?)
 						$node = 'y' if ($node eq '');
 
-            # Send out the reply
-						print "LOG\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n" if ($debug);
-						print "DATA\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n";
+            # Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
+						print "LOG\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n" if ($debug);
+						print "DATA\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n";
 					}
 				}
 			}
