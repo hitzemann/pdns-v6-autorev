@@ -91,42 +91,42 @@ sub rev_to_prefix {
 # Build domaintable from data in the database instead of the cfg file
 sub load_domaintable {
 
-  # Connect to the configured DB
-  my $d = DBI->connect($dsn, $dsn_user, $dsn_password);
-  $domaintable = {};
-  my $tmptable = {};
-  my $stmt = $d->prepare($q_domainmeta);
-  $stmt->execute or return;
+	# Connect to the configured DB
+	my $d = DBI->connect($dsn, $dsn_user, $dsn_password);
+	$domaintable = {};
+	my $tmptable = {};
+	my $stmt = $d->prepare($q_domainmeta);
+	$stmt->execute or return;
 
-  # Collect the involved zones
-  if ($stmt->rows) {
-    my ($i_domain_id, $s_domain, $s_kind, $s_content);
-    $stmt->bind_columns((\$i_domain_id, \$s_domain, \$s_kind, \$s_content));
-    while ($stmt->fetch) {
-      # If we end up here, you defined AUTOREV-PID for non ip6.arpa zones 
-		  next if ($s_domain =~ /ip6\.arpa$/);
-      if ($s_kind eq 'AUTOREV-PID') {
-		 	  $tmptable->{$i_domain_id}->{'domain'} = $s_domain;
-		 	  $tmptable->{$i_domain_id}->{'partner_id'} = int($s_content);
-      }
-    }
+	# Collect the involved zones
+	if ($stmt->rows) {
+		my ($i_domain_id, $s_domain, $s_kind, $s_content);
+		$stmt->bind_columns((\$i_domain_id, \$s_domain, \$s_kind, \$s_content));
+		while ($stmt->fetch) {
+			# If we end up here, you defined AUTOREV-PID for non ip6.arpa zones 
+			next if ($s_domain =~ /ip6\.arpa$/);
+			if ($s_kind eq 'AUTOREV-PID') {
+				$tmptable->{$i_domain_id}->{'domain'} = $s_domain;
+				$tmptable->{$i_domain_id}->{'partner_id'} = int($s_content);
+			}
+		}
 	}
 	$stmt->finish;
 	$stmt = $d->prepare($q_domain);
 
-   # Now we can build the right domaintable structure 
+	# Now we can build the right domaintable structure 
 	while (my ($d_id, $d_data) = each %$tmptable) {
-  	$stmt->execute(($d_data->{'partner_id'})) or next;
-  	if ($stmt->rows == 0) {
-  		print "LOG\tWARNING: Failed to locate prefix for ", $d_data->{'domain'}, "\n";
-  		next;
- 		}
- 		my ($prefix) = $stmt->fetchrow_array;
- 		$prefix = rev_to_prefix($prefix);
- 		$domaintable->{$d_data->{'domain'}} = $prefix;
+		$stmt->execute(($d_data->{'partner_id'})) or next;
+		if ($stmt->rows == 0) {
+			print "LOG\tWARNING: Failed to locate prefix for ", $d_data->{'domain'}, "\n";
+			next;
+		}
+		my ($prefix) = $stmt->fetchrow_array;
+		$prefix = rev_to_prefix($prefix);
+		$domaintable->{$d_data->{'domain'}} = $prefix;
 	}
-  $stmt->finish;
-  $d->disconnect;
+	$stmt->finish;
+	$d->disconnect;
 }
 
 # From now on we flush the output regularly.
@@ -147,14 +147,14 @@ unless ($helo =~ /HELO\t3/) {
 # If we use the database for generating the domaintable hash we will do it
 # now.
 if ($use_database) {
-  print "LOG\tLoading domains from database\n" if ($debug);
-  require DBI;
+	print "LOG\tLoading domains from database\n" if ($debug);
+	require DBI;
 	load_domaintable;
 } else {
-  print "LOG\tLoading domains from config file\n" if ($debug);
-  require Config::Simple;
-  my $Config = new Config::Simple('rev.cfg');
-  $domaintable = $Config->get_block('domaintable');
+	print "LOG\tLoading domains from config file\n" if ($debug);
+	require Config::Simple;
+	my $Config = new Config::Simple('rev.cfg');
+	$domaintable = $Config->get_block('domaintable');
 }
 
 my $domains;
@@ -171,14 +171,14 @@ while (my ($dom, $prefix) = each %$domaintable) {
 	# Now calculate the number of bits needed.
 	my $bits = length($tmp)*4;
 
-  # If the number of bits is not dividable by 16 ignore it (I yet have to
-  # understand what bad stuff would happen)
-  unless (0 == ($bits % 16)) {
-    print "LOG\t$dom has $prefix which cannot be divided by 16 - ignoring\n";
-    next;
-  }
+	# If the number of bits is not dividable by 16 ignore it (I yet have to
+	# understand what bad stuff would happen)
+	unless (0 == ($bits % 16)) {
+		print "LOG\t$dom has $prefix which cannot be divided by 16 - ignoring\n";
+		next;
+	}
 
-  # Now reverse the string and put dots in between.
+	# Now reverse the string and put dots in between.
 	$tmp = join '.', reverse split //, $tmp;
 	$tmp=~s/^[.]//;
 	$tmp=~s/[.]$//;
@@ -194,7 +194,7 @@ print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 while(<>) {
 	chomp;
 	my @arguments=split(/\t/);
-  # Check if there are 2 or 8 arguments. (2 for PING etc, 8 for Q) 
+	# Check if there are 2 or 8 arguments. (2 for PING etc, 8 for Q) 
 	unless (@arguments == 8  || @arguments == 2) {
 		print "LOG\tPowerDNS sent unparseable line\n";
 		print "FAIL\n";
@@ -205,7 +205,7 @@ while(<>) {
 	if (@arguments == 8) {
 
 		my ($type, $qname, $qclass, $qtype, $id, $ip, $localip, $endssubnet) = @arguments;
-    # Make sure it actually is a Q
+		# Make sure it actually is a Q
 		if ($type eq 'Q') {
 			print "LOG\t$qname $qclass $qtype?\n" if ($debug);
 
@@ -218,24 +218,24 @@ while(<>) {
 				# Check if it is our domain and if the node name looks sane
 				if ($domains->{$dom} and $node=~m/^[ybndrfg8ejkmcpqxot1uwisza345h769]+$/) {
 					# Fill node name with y, which will convert to leading zeroes in the final IP.
-          my $n = (128 - $domains->{$dom}{bits}) / 5;
+					my $n = (128 - $domains->{$dom}{bits}) / 5;
 					while (length($node) < $n) {
 						$node = join '', "y", $node;
 					}
 
-          # Now we convert the string to binary and the binary to hex.
+					# Now we convert the string to binary and the binary to hex.
 					$node = convert_binary_to_base16(convert_base32_to_binary($node));
 
-          # Check if the converted host part has the correct length for this domain
+					# Check if the converted host part has the correct length for this domain
 					$n = (128 - $domains->{$dom}{bits}) / 4;
 					if (length($node) == $n) {
-            # Take the host part we just calculated.
+						# Take the host part we just calculated.
 						my $dname = $node;
-            # Take the prefix from the hashtable.
+						# Take the prefix from the hashtable.
 						my $tmp = $domains->{$dom}{prefix};
-            # Concatenate them
+						# Concatenate them
 						$dname = $tmp.$dname;
-            # Put in the colons. Yes, this looks horrbily insane, but is roughly 250% faster than the previosu regexp way.
+						# Put in the colons. Yes, this looks horrbily insane, but is roughly 250% faster than the previosu regexp way.
 						$dname = join ':', substr($dname, 0, 4), substr($dname, 4, 4), substr($dname, 8, 4), substr($dname, 12, 4), substr($dname, 16, 4), substr($dname, 20, 4), substr($dname, 24, 4), substr($dname, 28, 4);
 
 						# Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
@@ -243,54 +243,54 @@ while(<>) {
 						print "DATA\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n";
 					}
 				}
-			# Check if this is a reverse lookup. Since PowerDNS mostly asks for ANY we need to check it we check for ip6.arpa at the end of the queried name.
+				# Check if this is a reverse lookup. Since PowerDNS mostly asks for ANY we need to check it we check for ip6.arpa at the end of the queried name.
 			} elsif (($qtype eq 'PTR' || $qtype eq 'ANY') && $qname=~/(.*\.ip6\.arpa$)/) {
-					my $node = $1;
+				my $node = $1;
 
 				# Check if this domain is served by us.
 				foreach(keys %$domains) {
-          # For each configured zone we extract the zone name
+					# For each configured zone we extract the zone name
 					my $key = $_;
 					my $dom = $domains->{$_}{domain};
-          # Now we check if the zone name is part of the hostname that we've been asked for
+					# Now we check if the zone name is part of the hostname that we've been asked for
 					my $index = index($node, $key);
 					if ($index != -1) {
 						$qname = $node;
-            # Since we already know where in the qname the zone name start, we can remove it easily from the string.
+						# Since we already know where in the qname the zone name start, we can remove it easily from the string.
 						$node = substr($qname, 0, $index-1);
-            # Reverse the node name and remove the dots
+						# Reverse the node name and remove the dots
 						$node = join '', reverse split /\./, $node;
 						# Now we convert from hex to binary and from binary to the host name string
 						$node = convert_binary_to_base32(convert_base16_to_binary($node));
 
 						# There might have been many leading zeroes which convert to y, we remove those as we add them again during the forward lookup
 						$node =~ s/^y*//;
-            # Special case: node IP was all zeroes (would that be valid?)
+						# Special case: node IP was all zeroes (would that be valid?)
 						$node = 'y' if ($node eq '');
 
-            # Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
+						# Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
 						print "LOG\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n" if ($debug);
 						print "DATA\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n";
 					}
 				}
 			}
 		} else {
-      # The type of the query was not Q
+			# The type of the query was not Q
 			print "FAIL\tUnsupported request\n";
 		}
 	} elsif (@arguments == 2) {
-    # This must be one of requests which need one argument (PING, AXFR)
+		# This must be one of requests which need one argument (PING, AXFR)
 		my ($type, $id) = @arguments;
-			if ($type eq 'PING') {
-        # We only need to reply with END to PING
-				print "LOG\tReceived a PING...\n" if ($debug);
-			} elsif ($type eq 'AXFR') {
-        # We do not support AXFR, but shall not send out a FAIL according to the docs
-				print "LOG\tReceived an AXFR for $id\n" if ($debug);
-			} else {
-        # This was neither PING nor AXFR, send out FAIL
-				print "FAIL\tUnsupported request\n";
-			}
+		if ($type eq 'PING') {
+			# We only need to reply with END to PING
+			print "LOG\tReceived a PING...\n" if ($debug);
+		} elsif ($type eq 'AXFR') {
+			# We do not support AXFR, but shall not send out a FAIL according to the docs
+			print "LOG\tReceived an AXFR for $id\n" if ($debug);
+		} else {
+			# This was neither PING nor AXFR, send out FAIL
+			print "FAIL\tUnsupported request\n";
+		}
 	}
 	#We are done with processing this request and can finalize it by sending END
 	print "END\n";
