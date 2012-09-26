@@ -16,7 +16,7 @@ PowerDNS Autoreverse Generator v1.0 (c) Aki Tuomi 2012
 
   launch=gsqlite3,pipe
   gsqlite3-database=/etc/powerdns/pdns.db
-  pipebackend-abi-version=1
+  pipebackend-abi-version=3
   pipe-command=/etc/powerdns/rev.pl
 
   Also, edit the script and add your dynamic domains. Please note that the  
