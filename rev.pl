@@ -144,8 +144,6 @@ unless ($helo =~ /HELO\t3/) {
 	exit;
 }
 
-# Believe it or not, this crashes if the OK does not come immediately after the HELO...
-print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 
 # If we use the database for generating the domaintable hash we will do it
 # now.
@@ -192,6 +190,7 @@ while (my ($dom, $prefix) = each %$domaintable) {
 	$domains->{"$tmp.ip6.arpa"} = { domain => $dom, bits => $bits };
 }
 
+print "OK\tAutomatic reverse generator v${VERSION} starting\n";
 
 while(<>) {
 	chomp;
