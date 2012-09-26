@@ -156,7 +156,7 @@ if ($use_database) {
 } else {
 	print "LOG\tLoading domains from config file\n" if ($debug);
 	require Config::Simple;
-	my $Config = new Config::Simple('rev.cfg');
+	my $Config = new Config::Simple($cfg);
 	$domaintable = $Config->get_block('domaintable');
 }
 
