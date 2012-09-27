@@ -3,6 +3,7 @@ use warnings;
 use 5.005;
 use IPC::Open3;
 use Symbol 'gensym'; 
+use Time::Hires qw( time );
 
 my($wr, $rd, $err);
 $err = gensym;
@@ -78,7 +79,7 @@ $scrap = <$rd>;
 my $t = time - $t0;
 
 print "OK\n";
-my $qps = 65535/$t;
+my $qps = 65536/$t;
 
 print "PTR Performance was $qps q/s\n";
 
@@ -101,7 +102,7 @@ $scrap = <$rd>;
 $t = time - $t0;
 
 print "OK\n";
-$qps = 65535/$t;
+$qps = 65536/$t;
 
 print "AAAA Performance was $qps q/s\n";
 
