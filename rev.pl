@@ -41,7 +41,8 @@ my %v2b = do {
 };
 my %b2v = reverse %v2b;
 
-# These four subs are the bottleneck of the backend. If you know a way to implement them fast please let me know.
+# These four subs are the bottleneck of the backend.
+# TODO: find a way to speed these up. The backend spends most of its time here.
 sub convert_base32_to_binary {
 	my $str = shift;
 	$str =~ tr/ybndrfg8ejkmcpqxot1uwisza345h769//cd;
@@ -202,7 +203,7 @@ while(<>) {
 		next;
 	}
 
-	# With 6-8 arguments it must be a Q request.
+	# With 8 arguments it must be a Q request.
 	if (@arguments == 8) {
 
 		my ($type, $qname, $qclass, $qtype, $id, $ip, $localip, $endssubnet) = @arguments;
