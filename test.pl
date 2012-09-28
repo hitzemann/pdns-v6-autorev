@@ -3,7 +3,9 @@ use warnings;
 use 5.005;
 use IPC::Open3;
 use Symbol 'gensym'; 
-use Time::Hires qw( time );
+my $method = eval "use Time::Hires qw( time ); 1" ? "hires" : "stock";
+
+print "Using ${method} time() call\n";
 
 my($wr, $rd, $err);
 $err = gensym;
