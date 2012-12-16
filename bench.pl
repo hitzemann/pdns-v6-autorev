@@ -2,7 +2,7 @@
 
 use strict;
 use 5.005;
-use Benchmark qw(:all);
+use Benchmark qw(:all :hireswallclock);
 
 cmpthese (0, {
         'join (new)' => sub {
