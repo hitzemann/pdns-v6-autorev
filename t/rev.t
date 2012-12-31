@@ -47,5 +47,3 @@ is ($read, "FAIL\tUnsupported request", "Illegal Request");
 $read = <$rd>;
 chomp $read;
 is ($read, "END", "Illegal Request terminator");
-
-done_testing();
