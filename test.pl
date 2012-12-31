@@ -56,10 +56,10 @@ harness;
 result "Open", speak_and_expect "HELO\t3","^OK.*";
 
 speak "Q\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1";
-result "Reverse ",expect "DATA\t0\t1\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tPTR\t300\t-1\tnode-gaydambqgaydaztfhfrdoolbgq.dyn.test";
+result "Reverse ",expect "DATA\t0\t1\t4.a.9.7.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tPTR\t300\t-1\tnode-h6tn42i.dyn.test";
 expect "END";
-speak "Q\tnode-gaydambqgaydaztfhfrdoolbgq.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1";
-result "Forward ",expect "DATA\t0\t1\tnode-gaydambqgaydaztfhfrdoolbgq.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250:56ff:0000:0000:fe9b:79a4";
+speak "Q\tnode-h6tn42i.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1";
+result "Forward ",expect "DATA\t0\t1\tnode-h6tn42i.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250:56ff:0000:0000:fe9b:79a4";
 expect "END";
 
 my @list;
