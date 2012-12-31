@@ -1,4 +1,4 @@
-PowerDNS Autoreverse Generator v1.0 (c) Aki Tuomi 2012
+PowerDNS Autoreverse Generator v0.6 (c) Simon Hitzemann, Aki Tuomi 2013
 
 1. Installation
 2. Configuration
@@ -43,7 +43,6 @@ PowerDNS Autoreverse Generator v1.0 (c) Aki Tuomi 2012
 
 3. Testing
 
-  The script comes with a very small test suite which you can run. It will not
-  work if you change the rev.pl settings. It'll check that the script produces
-  known good values, and also gives estimate how fast it can perform.
+  Run prove for functional testing. There is also test.pl which tries to
+  measure the qps that can be achieved. I don't trust it tough.
  
