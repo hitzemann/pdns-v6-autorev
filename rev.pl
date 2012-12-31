@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 ##
 # IPv6 automatic reverse/forward generator script by Aki Tuomi
@@ -6,9 +6,7 @@
 # Released under the GNU GENERAL PUBLIC LICENSE v2
 ##
 
-use strict;
-use warnings;
-use 5.005;
+use Modern::Perl;
 use Config::Simple;
 # RFC forces the [A-Z2-7] RFC-3548 compliant encoding
 use MIME::Base32 qw( RFC );
