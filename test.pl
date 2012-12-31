@@ -1,9 +1,6 @@
-use strict;
-use warnings;
-use 5.005;
+use Modern::Perl;
 use IPC::Open3;
 use Symbol 'gensym'; 
-use Data::Dumper;
 my $method = eval "use Time::Hires qw( time ); 1" ? "hires" : "stock";
 
 print "Using ${method} time() call\n";
