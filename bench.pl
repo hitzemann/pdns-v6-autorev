@@ -1,7 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
-use strict;
-use 5.005;
+use Modern::Perl;
 use Benchmark qw(:all :hireswallclock);
 
 cmpthese (0, {
