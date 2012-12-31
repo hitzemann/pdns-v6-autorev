@@ -28,7 +28,7 @@ my $q_domainmeta = "SELECT domains.id,domains.name,domainmetadata.kind,domainmet
 my $q_domain = 'SELECT domains.name FROM domains WHERE id = ?';
 
 my $ttl = 300;
-my $debug = 1;
+my $debug = 0;
 # Set to 1 if you want to use Memoize. It needs more memory, but speeds queries up. It makes only sense though if you have a lot of different subnets with identical host parts.
 my $memoize = 0;
 my $nodeprefix = 'node-';
@@ -181,15 +181,10 @@ while(<>) {
 
 				# Check if it is our domain and if the node name looks sane
 				if ($domains->{$dom} and $node=~m/^[A-Za-z2-7]+$/) {
-					# Fill node name with y, which will convert to leading zeroes in the final IP.
-					my $n = (128 - $domains->{$dom}{bits}) / 5;
-                                        # TODO find the equivalent to y in RFC MIME32 mode
-                                        #while (length($node) < $n) {
-                                        #	$node = join '', "y", $node;
-                                        #}
+                                        my $n = (128 - $domains->{$dom}{bits}) / 5;
 
-					# Now we convert the string to binary and the binary to hex.
-                                        $node = MIME::Base32::decode($node);
+                                        # Convert from Base 32 back to Base 16
+                                        $node = MIME::Base32::decode(uc($node));
 
 					# Check if the converted host part has the correct length for this domain
 					$n = (128 - $domains->{$dom}{bits}) / 4;
@@ -225,14 +220,8 @@ while(<>) {
 						$node = substr($qname, 0, $index-1);
 						# Reverse the node name and remove the dots
 						$node = join '', reverse split /\./, $node;
-						# Now we convert from hex to binary and from binary to the host name string
-                                                $node = MIME::Base32::encode($node);
-
-                                                # TODO find the equivalent to zeroes/y in RFC MIME32 mode
-						# There might have been many leading zeroes which convert to y, we remove those as we add them again during the forward lookup
-                                                #$node =~ s/^y*//;
-						# Special case: node IP was all zeroes (would that be valid?)
-                                                #$node = 'y' if ($node eq '');
+						# Convert from Base 16 to Base 32
+                                                $node = lc(MIME::Base32::encode($node));
 
 						# Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
 						print "LOG\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n" if ($debug);
