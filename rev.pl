@@ -30,7 +30,7 @@ my $debug = 0;
 # Set to 1 if you want to use Memoize. It needs more memory, but speeds queries up. It makes only sense though if you have a lot of different subnets with identical host parts.
 my $memoize = 0;
 my $nodeprefix = 'node-';
-my $VERSION = "0.4";
+my $VERSION = "0.5";
 
 # End of configuration.
 
