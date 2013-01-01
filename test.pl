@@ -75,8 +75,8 @@ while ($t1->need_more_samples('ptr')) {
     $t1->start('ptr');
     print $wr "Q\t$val.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
     my $scrap = <$rd>;
-    $t1->stop('ptr');
     $scrap = <$rd>;
+    $t1->stop('ptr');
 }
 
 print "OK, ";
@@ -99,8 +99,8 @@ while ($t2->need_more_samples('aaaa')) {
     $t2->start('aaaa');
     print $wr "Q\tnode-$val.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
     my $scrap = <$rd>;
-    $t2->stop('aaaa');
     $scrap = <$rd>;
+    $t2->stop('aaaa');
 }
 
 print "OK, ";
