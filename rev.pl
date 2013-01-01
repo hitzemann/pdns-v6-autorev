@@ -94,6 +94,7 @@ sub load_domaintable {
     }
     $stmt->finish;
     $d->disconnect;
+    return;
 }
 
 # From now on we flush the output regularly.
