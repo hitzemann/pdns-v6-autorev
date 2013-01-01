@@ -97,8 +97,7 @@ sub load_domaintable {
 }
 
 # From now on we flush the output regularly.
-# TODO: Do we need this? We use \n at the end of every print command.
-$| = 1;
+local $| = 1;
 
 # Perform handshake with PowerDNS. We support ABI versions 1 and 2 since we do check for number of arguments >= 6 and do not use fields 7 and 8. Version 3 would need a different answer format.
 my $helo = <>;
