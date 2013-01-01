@@ -1,11 +1,7 @@
 use Modern::Perl;
 use IPC::Open3;
 use Symbol 'gensym'; 
-my $method = eval "use Time::Hires qw( time ); 1" ? "hires" : "stock";
 use Benchmark::Timer;
-use Data::Dumper;
-
-print "Using ${method} time() call\n";
 
 my($wr, $rd, $err);
 $err = gensym;
