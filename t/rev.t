@@ -1,6 +1,6 @@
 use Modern::Perl;
 use autodie;
-use Test::More tests => 11;
+use Test::More tests => 14;
 use IPC::Open3;
 use Symbol 'gensym';
 
@@ -29,6 +29,19 @@ is ($read, "DATA\t0\t1\tnode-h6tn42i.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250
 $read = <$rd>;
 chomp $read;
 is ($read, "END", "AAAA answer terminator");
+
+print $wr "Q\tnode-a.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+$read = <$rd>;
+chomp $read;
+is ($read, "DATA\t0\t1\tnode-a.dyn.test\tIN\tAAAA\t300\t-1\tfe80:0000:0250:56ff:0000:0000:0000:0000", "AAAA record all zeroes");
+$read = <$rd>;
+chomp $read;
+is ($read, "END", "AAAA answer all zeroes terminator");
+
+print $wr "Q\tnode-.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+$read = <$rd>;
+chomp $read;
+is ($read, "END", "AAAA answer empty node name");
 
 print $wr "PING\t1\n";
 $read = <$rd>;
