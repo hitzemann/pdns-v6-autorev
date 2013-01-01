@@ -2,6 +2,8 @@ use Modern::Perl;
 use IPC::Open3;
 use Symbol 'gensym'; 
 my $method = eval "use Time::Hires qw( time ); 1" ? "hires" : "stock";
+use Benchmark::Timer;
+use Data::Dumper;
 
 print "Using ${method} time() call\n";
 
@@ -69,19 +71,20 @@ push @list, (join '.', split //, sprintf("%04x",$_));
 } (0 .. 0xffff);
 
 # speed test
-print "Testing speed for 0000 to ffff PTRs (this will take some time)";
-my $t0 = time;
-map { 
-print $wr "Q\t$_.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
-my $scrap = <$rd>;
-$scrap = <$rd>;
-} @list;
-my $t = time - $t0;
+print "Testing speed for PTRs (this will take some time)";
+my $t1 = Benchmark::Timer->new(skip => 100, confidence => 97.5, error => 2, minimum => 2000);
+while ($t1->need_more_samples('ptr')) {
+    my $val = pop @list;
+    $t1->start('ptr');
+    print $wr "Q\t$val.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+    my $scrap = <$rd>;
+    $t1->stop('ptr');
+    $scrap = <$rd>;
+}
 
-print "OK\n";
-my $qps = 65536/$t;
-
-print "PTR Performance was $qps q/s\n";
+print "OK, ";
+say "qps: ".1/$t1->result('ptr');
+say $t1->report;
 
 @list = [];
 open(NOD, '<nodes.txt');
@@ -92,18 +95,19 @@ while (my $line = <NOD>) {
 close(NOD);
 shift @list;
 
-print "Testing speed for 0000 to ffff AAAAs (this will take some time)";
-$t0 = time;
-map {
-print $wr "Q\tnode-$_.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
-my $scrap = <$rd>;
-$scrap = <$rd>;
-} @list;
-$t = time - $t0;
+print "Testing speed for AAAAs (this will take some time)";
+my $t2 = Benchmark::Timer->new(skip => 100, confidence => 97.5, error => 2, minimum => 2000);
+while ($t2->need_more_samples('aaaa')) {
+    my $val = pop @list;
+    $t2->start('aaaa');
+    print $wr "Q\tnode-$val.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+    my $scrap = <$rd>;
+    $t2->stop('aaaa');
+    $scrap = <$rd>;
+}
 
-print "OK\n";
-$qps = 65536/$t;
-
-print "AAAA Performance was $qps q/s\n";
+print "OK, ";
+say "qps: ".1/$t2->result('aaaa');
+say $t2->report;
 
 finish;
