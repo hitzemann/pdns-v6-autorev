@@ -1,6 +1,6 @@
 use Modern::Perl;
 use autodie;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use IPC::Open3;
 use Symbol 'gensym';
 
@@ -47,3 +47,25 @@ is ($read, "FAIL\tUnsupported request", "Illegal Request");
 $read = <$rd>;
 chomp $read;
 is ($read, "END", "Illegal Request terminator");
+
+subtest 'Bidirectional correctness' => sub {
+    plan tests => 20000;
+
+    use Math::Random::Secure qw(irand);
+
+    for (1..20000) {
+        my $val = irand(2**64);
+        my $ptr = join('.', reverse split(//, unpack("h*", pack("Q", $val)))).".f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa";
+        print $wr "Q\t$ptr\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+        $read = <$rd>;
+        $read =~ /(node-.*\.dyn\.test)/;
+        my $node = $1;
+        $read = <$rd>;
+        print $wr "Q\t$node\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
+        $read = <$rd>;
+        my $hex = unpack("h*", pack("Q", $val));
+        $read =~ s/://g;
+        like ($read, qr/$hex/, "Bidirectionality for $val");
+        $read = <$rd>;
+    }
+}
