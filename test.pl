@@ -1,4 +1,5 @@
 use Modern::Perl;
+use autodie qw( :all );
 use IPC::Open3;
 use Symbol 'gensym'; 
 use Benchmark::Timer;
