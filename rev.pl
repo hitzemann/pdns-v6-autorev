@@ -84,8 +84,8 @@ sub load_domaintable {
     while ( my ( $d_id, $d_data ) = each %$tmptable ) {
         $stmt->execute( ( $d_data->{'partner_id'} ) ) or next;
         if ( $stmt->rows == 0 ) {
-            print "LOG\tWARNING: Failed to locate prefix for ",
-              $d_data->{'domain'}, "\n";
+            say "LOG\tWARNING: Failed to locate prefix for ",
+              $d_data->{'domain'};
             next;
         }
         my ($prefix) = $stmt->fetchrow_array;
@@ -106,7 +106,7 @@ chomp($helo);
 
 # Game has changed, check for ABI version 3 only
 unless ( $helo =~ /HELO\t3/ ) {
-    print "FAIL\n";
+    say "FAIL";
     while (<>) { }
     exit;
 }
@@ -114,12 +114,12 @@ unless ( $helo =~ /HELO\t3/ ) {
 # If we use the database for generating the domaintable hash we will do it
 # now.
 if ($use_database) {
-    print "LOG\tLoading domains from database\n" if ($debug);
+    say "LOG\tLoading domains from database" if ($debug);
     require DBI;
     load_domaintable;
 }
 else {
-    print "LOG\tLoading domains from config file\n" if ($debug);
+    say "LOG\tLoading domains from config file" if ($debug);
     require Config::Simple;
     my $Config = Config::Simple->new();
     $Config->read($cfg);
@@ -143,8 +143,8 @@ while ( my ( $dom, $prefix ) = each %$domaintable ) {
     # If the number of bits is not dividable by 16 ignore it (I yet have to
     # understand what bad stuff would happen)
     unless ( 0 == ( $bits % 16 ) ) {
-        print
-          "LOG\t$dom has $prefix which cannot be divided by 16 - ignoring\n";
+        say
+          "LOG\t$dom has $prefix which cannot be divided by 16 - ignoring";
         next;
     }
 
@@ -160,7 +160,7 @@ while ( my ( $dom, $prefix ) = each %$domaintable ) {
     $domains->{"$tmp.ip6.arpa"} = { domain => $dom, bits => $bits };
 }
 
-print "OK\tAutomatic reverse generator v${VERSION} starting\n";
+say "OK\tAutomatic reverse generator v${VERSION} starting";
 
 while (<>) {
     chomp;
@@ -168,8 +168,8 @@ while (<>) {
 
     # Check if there are 2 or 8 arguments. (2 for PING etc, 8 for Q)
     unless ( @arguments == 8 || @arguments == 2 ) {
-        print "LOG\tPowerDNS sent unparseable line\n";
-        print "FAIL\n";
+        say "LOG\tPowerDNS sent unparseable line";
+        say "FAIL";
         next;
     }
 
@@ -181,7 +181,7 @@ while (<>) {
 
         # Make sure it actually is a Q
         if ( $type eq 'Q' ) {
-            print "LOG\t$qname $qclass $qtype?\n" if ($debug);
+            say "LOG\t$qname $qclass $qtype?" if ($debug);
 
 # Check if this is a forward lookup, since PowerDNS mostly sends ANY as request type we need to check if the configured nodeprefix is present.
             if ( ( $qtype eq 'AAAA' || $qtype eq 'ANY' )
@@ -189,7 +189,7 @@ while (<>) {
             {
                 my $node = $1;
                 my $dom  = $2;
-                print "LOG\t$node $dom and ", $domains->{$dom}{prefix}, "\n"
+                say "LOG\t$node $dom and ", $domains->{$dom}{prefix},
                   if ($debug);
 
                 # Check if it is our domain and if the node name looks sane
@@ -223,11 +223,11 @@ while (<>) {
                           substr( $dname, 28, 4 );
 
 # Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
-                        print
-"LOG\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n"
+                        say
+"LOG\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname"
                           if ($debug);
-                        print
-"DATA\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname\n";
+                        say
+"DATA\t0\t1\t$qname\t$qclass\tAAAA\t$ttl\t$id\t$dname";
                     }
                 }
 
@@ -267,18 +267,19 @@ while (<>) {
                         $node = 'a' if ( $node eq '' );
 
 # Send out the reply (0 are the hardcoded bits from ednssubnet used for the reply, 1 says the answer is auth)
-                        print
-"LOG\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n"
+                        say
+"LOG\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom"
                           if ($debug);
-                        print
-"DATA\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom\n";
+                        say
+"DATA\t0\t1\t$qname\t$qclass\tPTR\t$ttl\t$id\t$nodeprefix$node.$dom";
                     }
                 }
             }
         }
         else {
             # The type of the query was not Q
-            print "FAIL\tUnsupported request\n";
+            say "FAIL\tUnsupported request";
+            next;
         }
     }
     elsif ( @arguments == 2 ) {
@@ -288,20 +289,20 @@ while (<>) {
         if ( $type eq 'PING' ) {
 
             # We only need to reply with END to PING
-            print "LOG\tReceived a PING...\n" if ($debug);
+            say "LOG\tReceived a PING..." if ($debug);
         }
         elsif ( $type eq 'AXFR' ) {
 
    # We do not support AXFR, but shall not send out a FAIL according to the docs
-            print "LOG\tReceived an AXFR for $id\n" if ($debug);
+            say "LOG\tReceived an AXFR for $id" if ($debug);
         }
         else {
             # This was neither PING nor AXFR, send out FAIL
-            print "FAIL\tUnsupported request\n";
+            say "FAIL\tUnsupported request";
             next;
         }
     }
 
     #We are done with processing this request and can finalize it by sending END
-    print "END\n";
+    say "END";
 }
