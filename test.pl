@@ -61,10 +61,10 @@ push @list, (join '.', split //, sprintf("%04x",$_));
 } (0 .. 0xffff);
 
 # speed test
-print "Testing speed for PTRs (this will take some time)";
-my $t1 = Benchmark::Timer->new(skip => 100, confidence => 97.5, error => 2, minimum => 2000);
-while ($t1->need_more_samples('ptr')) {
-    my $val = pop @list;
+say "Speed tests, this may take some time";
+print "Testing speed for PTRs ";
+my $t1 = Benchmark::Timer->new(skip => 1);
+foreach my $val (@list) {
     $t1->start('ptr');
     print $wr "Q\t$val.b.9.e.f.0.0.0.0.0.0.0.0.f.f.6.5.0.5.2.0.0.0.0.0.0.8.e.f.ip6.arpa\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
     my $scrap = <$rd>;
@@ -85,10 +85,9 @@ while (my $line = <NOD>) {
 close(NOD);
 shift @list;
 
-print "Testing speed for AAAAs (this will take some time)";
-my $t2 = Benchmark::Timer->new(skip => 100, confidence => 97.5, error => 2, minimum => 2000);
-while ($t2->need_more_samples('aaaa')) {
-    my $val = pop @list;
+print "Testing speed for AAAAs ";
+my $t2 = Benchmark::Timer->new(skip => 1);
+foreach my $val (@list) {
     $t2->start('aaaa');
     print $wr "Q\tnode-$val.dyn.test\tIN\tANY\t-1\t127.0.0.1\t127.0.0.1\t127.0.0.1\n";
     my $scrap = <$rd>;
