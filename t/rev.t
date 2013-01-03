@@ -1,6 +1,6 @@
 use Modern::Perl;
 use autodie;
-use Test::More tests => 14;
+use Test::More tests => 13;
 use IPC::Open3;
 use Symbol 'gensym';
 
@@ -57,9 +57,6 @@ print $wr "FOO\tBAR\n";
 $read = <$rd>;
 chomp $read;
 is ($read, "FAIL\tUnsupported request", "Illegal Request");
-$read = <$rd>;
-chomp $read;
-is ($read, "END", "Illegal Request terminator");
 
 subtest 'Bidirectional correctness' => sub {
     plan tests => 20000;

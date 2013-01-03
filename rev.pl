@@ -298,6 +298,7 @@ while (<>) {
         else {
             # This was neither PING nor AXFR, send out FAIL
             print "FAIL\tUnsupported request\n";
+            next;
         }
     }
 
