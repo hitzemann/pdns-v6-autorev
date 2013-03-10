@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Modern::Perl;
 use autodie qw( :all );
 use IPC::Open3;
