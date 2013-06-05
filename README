@@ -44,5 +44,5 @@ PowerDNS Autoreverse Generator v0.6 (c) Simon Hitzemann, Aki Tuomi 2013
 3. Testing
 
   Run prove for functional testing. There is also test.pl which tries to
-  measure the qps that can be achieved. I don't trust it tough.
+  measure the qps that can be achieved. I don't trust it though.
  
